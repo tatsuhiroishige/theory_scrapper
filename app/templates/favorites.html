@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}My Favorites{% endblock %}
+
+{% block content %}
+<h1 class="mb-4"><i class="bi bi-star-fill text-warning"></i> My Favorites</h1>
+
+{% if papers %}
+<div class="row">
+    {% for paper in papers %}
+    <div class="col-12 mb-3">
+        <div class="card paper-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title">
+                        <a href="{{ url_for('main.paper_detail', paper_id=paper.id) }}" class="text-decoration-none">
+                            {{ paper.title }}
+                        </a>
+                    </h5>
+                    <div class="favorite-btn">
+                        <form action="{{ url_for('favorites.remove_favorite', paper_id=paper.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-warning" title="Remove from favorites">
+                                <i class="bi bi-star-fill"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <p class="card-subtitle mb-2 text-muted small">{{ paper.authors }}</p>
+                <p class="card-text abstract-preview">{{ paper.abstract[:300] }}{% if paper.abstract|length > 300 %}...{% endif %}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="badge bg-secondary me-1">{{ paper.categories.split(',')[0] }}</span>
+                        <small class="text-muted">{{ paper.published_date.strftime('%Y-%m-%d') if paper.published_date else 'N/A' }}</small>
+                    </div>
+                    <div>
+                        <a href="{{ paper.pdf_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-file-pdf"></i> PDF
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i> You haven't saved any papers yet. Browse the <a href="{{ url_for('main.index') }}">latest papers</a> and click the star to save them.
+</div>
+{% endif %}
+{% endblock %}

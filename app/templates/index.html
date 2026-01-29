@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Latest Hadron Physics Papers{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-journal-text"></i> Latest Papers</h1>
+    <a href="{{ url_for('main.refresh_papers') }}" class="btn btn-primary">
+        <i class="bi bi-arrow-clockwise"></i> Refresh from arXiv
+    </a>
+</div>
+
+<!-- Search and Filter Section -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('main.index') }}" class="row g-3">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" name="q" placeholder="Search papers..."
+                           value="{{ search_query or '' }}">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select class="form-select" name="keyword">
+                    <option value="">All Keywords</option>
+                    {% for kw, count in keywords %}
+                    <option value="{{ kw.name }}" {% if current_keyword == kw.name %}selected{% endif %}>
+                        {{ kw.name }} ({{ count }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-primary w-100">Filter</button>
+            </div>
+        </form>
+        {% if current_keyword or search_query %}
+        <div class="mt-2">
+            <a href="{{ url_for('main.index') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-x-circle"></i> Clear filters
+            </a>
+            {% if current_keyword %}
+            <span class="badge bg-primary ms-2">Keyword: {{ current_keyword }}</span>
+            {% endif %}
+            {% if search_query %}
+            <span class="badge bg-info ms-2">Search: {{ search_query }}</span>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if papers %}
+<div class="row">
+    {% for paper in papers %}
+    <div class="col-12 mb-3">
+        <div class="card paper-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title">
+                        <a href="{{ url_for('main.paper_detail', paper_id=paper.id) }}" class="text-decoration-none">
+                            {{ paper.title }}
+                        </a>
+                    </h5>
+                    {% if current_user.is_authenticated %}
+                    <div class="favorite-btn">
+                        {% if paper.id in favorite_ids %}
+                        <form action="{{ url_for('favorites.remove_favorite', paper_id=paper.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-warning" title="Remove from favorites">
+                                <i class="bi bi-star-fill"></i>
+                            </button>
+                        </form>
+                        {% else %}
+                        <form action="{{ url_for('favorites.add_favorite', paper_id=paper.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Add to favorites">
+                                <i class="bi bi-star"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                <p class="card-subtitle mb-2 text-muted small">{{ paper.authors }}</p>
+                <p class="card-text abstract-preview">{{ paper.abstract[:300] }}{% if paper.abstract|length > 300 %}...{% endif %}</p>
+                {% if paper.keywords %}
+                <div class="mb-2">
+                    {% for kw in paper.keywords[:5] %}
+                    <a href="{{ url_for('main.index', keyword=kw.name) }}" class="badge bg-info text-decoration-none me-1">{{ kw.name }}</a>
+                    {% endfor %}
+                    {% if paper.keywords|length > 5 %}
+                    <span class="badge bg-light text-dark">+{{ paper.keywords|length - 5 }} more</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="badge bg-secondary me-1">{{ paper.categories.split(',')[0] }}</span>
+                        <small class="text-muted">{{ paper.published_date.strftime('%Y-%m-%d') if paper.published_date else 'N/A' }}</small>
+                    </div>
+                    <div>
+                        <a href="{{ paper.pdf_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-file-pdf"></i> PDF
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i> No papers found. Click "Refresh from arXiv" to fetch the latest papers.
+</div>
+{% endif %}
+{% endblock %}

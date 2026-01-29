@@ -1,0 +1,82 @@
+/* Hadron Physics Theory Scraper - Custom Styles */
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Paper cards */
+.paper-card {
+    transition: box-shadow 0.2s ease;
+}
+
+.paper-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.paper-card .card-title a {
+    color: #212529;
+}
+
+.paper-card .card-title a:hover {
+    color: #0d6efd;
+}
+
+/* Abstract styling */
+.abstract-preview {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.5;
+}
+
+.abstract-full {
+    white-space: pre-line;
+    line-height: 1.6;
+}
+
+/* Favorite button */
+.favorite-btn button {
+    transition: transform 0.2s ease;
+}
+
+.favorite-btn button:hover {
+    transform: scale(1.1);
+}
+
+/* Navbar brand */
+.navbar-brand i {
+    font-size: 1.3rem;
+}
+
+/* Category badges */
+.badge {
+    font-weight: 500;
+}
+
+/* Card improvements */
+.card-header h4,
+.card-header h5 {
+    margin-bottom: 0;
+}
+
+/* Form styling */
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .paper-card .card-title {
+        font-size: 1rem;
+    }
+
+    .abstract-preview {
+        font-size: 0.85rem;
+    }
+}
