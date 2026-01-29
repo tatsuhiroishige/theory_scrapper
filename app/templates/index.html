@@ -5,23 +5,44 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1><i class="bi bi-journal-text"></i> Latest Papers</h1>
-    <a href="{{ url_for('main.refresh_papers') }}" class="btn btn-primary">
-        <i class="bi bi-arrow-clockwise"></i> Refresh from arXiv
-    </a>
+    <div class="btn-group">
+        <a href="{{ url_for('main.refresh_papers') }}" class="btn btn-primary">
+            <i class="bi bi-arrow-clockwise"></i> Refresh All
+        </a>
+        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
+            <span class="visually-hidden">Toggle Dropdown</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="{{ url_for('main.refresh_papers', source='arxiv') }}">arXiv only</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('main.refresh_papers', source='journals') }}">Journals only</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{{ url_for('main.refresh_papers') }}">All sources</a></li>
+        </ul>
+    </div>
 </div>
 
 <!-- Search and Filter Section -->
 <div class="card mb-4">
     <div class="card-body">
         <form method="GET" action="{{ url_for('main.index') }}" class="row g-3">
-            <div class="col-md-6">
+            <div class="col-md-5">
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-search"></i></span>
                     <input type="text" class="form-control" name="q" placeholder="Search papers..."
                            value="{{ search_query or '' }}">
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <select class="form-select" name="source">
+                    <option value="">All Sources</option>
+                    {% for src, count in sources %}
+                    <option value="{{ src }}" {% if current_source == src %}selected{% endif %}>
+                        {{ get_source_display_name(src) }} ({{ count }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
                 <select class="form-select" name="keyword">
                     <option value="">All Keywords</option>
                     {% for kw, count in keywords %}
@@ -31,15 +52,18 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-1">
                 <button type="submit" class="btn btn-outline-primary w-100">Filter</button>
             </div>
         </form>
-        {% if current_keyword or search_query %}
+        {% if current_keyword or search_query or current_source %}
         <div class="mt-2">
             <a href="{{ url_for('main.index') }}" class="btn btn-sm btn-outline-secondary">
                 <i class="bi bi-x-circle"></i> Clear filters
             </a>
+            {% if current_source %}
+            <span class="badge bg-success ms-2">Source: {{ get_source_display_name(current_source) }}</span>
+            {% endif %}
             {% if current_keyword %}
             <span class="badge bg-primary ms-2">Keyword: {{ current_keyword }}</span>
             {% endif %}
@@ -95,7 +119,8 @@
                 {% endif %}
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <span class="badge bg-secondary me-1">{{ paper.categories.split(',')[0] }}</span>
+                        <a href="{{ url_for('main.index', source=paper.source) }}" class="badge bg-success text-decoration-none me-1">{{ get_source_display_name(paper.source) }}</a>
+                        <span class="badge bg-secondary me-1">{{ paper.categories.split(',')[0] if paper.categories else '' }}</span>
                         <small class="text-muted">{{ paper.published_date.strftime('%Y-%m-%d') if paper.published_date else 'N/A' }}</small>
                     </div>
                     <div>
@@ -111,7 +136,7 @@
 </div>
 {% else %}
 <div class="alert alert-info">
-    <i class="bi bi-info-circle"></i> No papers found. Click "Refresh from arXiv" to fetch the latest papers.
+    <i class="bi bi-info-circle"></i> No papers found. Click "Refresh All" to fetch the latest papers from all sources.
 </div>
 {% endif %}
 {% endblock %}

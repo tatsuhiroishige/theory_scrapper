@@ -51,20 +51,23 @@ class Paper(db.Model):
     __tablename__ = 'papers'
 
     id = db.Column(db.Integer, primary_key=True)
-    arxiv_id = db.Column(db.String(50), unique=True, nullable=False, index=True)
+    external_id = db.Column(db.String(200), unique=True, nullable=False, index=True)
+    source = db.Column(db.String(50), nullable=False, default='arxiv', index=True)
     title = db.Column(db.Text, nullable=False)
     authors = db.Column(db.Text, nullable=False)
     abstract = db.Column(db.Text)
     categories = db.Column(db.String(200))
     published_date = db.Column(db.DateTime, index=True)
     pdf_url = db.Column(db.String(500))
+    doi = db.Column(db.String(100), index=True)
+    journal = db.Column(db.String(200))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     favorites = db.relationship('Favorite', backref='paper', lazy='dynamic', cascade='all, delete-orphan')
     keywords = db.relationship('Keyword', secondary=paper_keywords, back_populates='papers')
 
     def __repr__(self):
-        return f'<Paper {self.arxiv_id}>'
+        return f'<Paper {self.source}:{self.external_id}>'
 
 
 class Favorite(db.Model):

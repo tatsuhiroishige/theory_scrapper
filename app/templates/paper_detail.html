@@ -38,11 +38,18 @@
         </div>
 
         <div class="mb-3">
+            <strong>Source:</strong>
+            <span class="badge bg-success">{{ paper.journal or paper.source }}</span>
+        </div>
+
+        {% if paper.categories %}
+        <div class="mb-3">
             <strong>Categories:</strong>
             {% for cat in paper.categories.split(',') %}
             <span class="badge bg-secondary">{{ cat.strip() }}</span>
             {% endfor %}
         </div>
+        {% endif %}
 
         {% if paper.keywords %}
         <div class="mb-3">
@@ -58,9 +65,16 @@
             <span>{{ paper.published_date.strftime('%B %d, %Y') if paper.published_date else 'N/A' }}</span>
         </div>
 
+        {% if paper.doi %}
         <div class="mb-3">
-            <strong>arXiv ID:</strong>
-            <a href="{{ paper.arxiv_id }}" target="_blank">{{ paper.arxiv_id }}</a>
+            <strong>DOI:</strong>
+            <a href="https://doi.org/{{ paper.doi }}" target="_blank">{{ paper.doi }}</a>
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <strong>ID:</strong>
+            <a href="{{ paper.external_id }}" target="_blank">{{ paper.external_id }}</a>
         </div>
 
         <hr>
@@ -71,11 +85,18 @@
         </div>
 
         <div class="d-flex gap-2">
+            {% if paper.pdf_url %}
             <a href="{{ paper.pdf_url }}" target="_blank" class="btn btn-primary">
-                <i class="bi bi-file-pdf"></i> Download PDF
+                <i class="bi bi-file-pdf"></i> View Paper
             </a>
-            <a href="{{ paper.arxiv_id }}" target="_blank" class="btn btn-outline-secondary">
-                <i class="bi bi-box-arrow-up-right"></i> View on arXiv
+            {% endif %}
+            {% if paper.doi %}
+            <a href="https://doi.org/{{ paper.doi }}" target="_blank" class="btn btn-outline-secondary">
+                <i class="bi bi-box-arrow-up-right"></i> View via DOI
+            </a>
+            {% endif %}
+            <a href="{{ paper.external_id }}" target="_blank" class="btn btn-outline-secondary">
+                <i class="bi bi-box-arrow-up-right"></i> View Original
             </a>
         </div>
     </div>

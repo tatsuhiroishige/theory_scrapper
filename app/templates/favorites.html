@@ -29,7 +29,8 @@
                 <p class="card-text abstract-preview">{{ paper.abstract[:300] }}{% if paper.abstract|length > 300 %}...{% endif %}</p>
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <span class="badge bg-secondary me-1">{{ paper.categories.split(',')[0] }}</span>
+                        <span class="badge bg-success me-1">{{ paper.journal or paper.source }}</span>
+                        <span class="badge bg-secondary me-1">{{ paper.categories.split(',')[0] if paper.categories else '' }}</span>
                         <small class="text-muted">{{ paper.published_date.strftime('%Y-%m-%d') if paper.published_date else 'N/A' }}</small>
                     </div>
                     <div>
